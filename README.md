@@ -28,4 +28,7 @@ One row in my ML feature table = one race or lap
 
 
 ## AI Usage
-[Which AI tools you used and for which parts]
+Claude 
+    for picking and choosing which fields to pull from APIs
+    data flow png
+    honing in on error from schema
