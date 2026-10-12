@@ -1,3 +1,22 @@
+-- schema.sql | F1 race outcome prediction | PostgreSQL
+-- Prediction unit: one driver in one race. Target: points scored.
+-- Safe to re-run: drops everything first (view, facts, then dims).
+-- =====================================================================
+ 
+DROP VIEW  IF EXISTS ml_features_race_outcome CASCADE;
+DROP TABLE IF EXISTS fact_race_control    CASCADE;
+DROP TABLE IF EXISTS fact_stint           CASCADE;
+DROP TABLE IF EXISTS fact_pit_stop        CASCADE;
+DROP TABLE IF EXISTS fact_weather         CASCADE;
+DROP TABLE IF EXISTS fact_driver_standing CASCADE;
+DROP TABLE IF EXISTS fact_qualifying      CASCADE;
+DROP TABLE IF EXISTS fact_race_result     CASCADE;
+DROP TABLE IF EXISTS dim_race             CASCADE;
+DROP TABLE IF EXISTS dim_team             CASCADE;
+DROP TABLE IF EXISTS dim_driver           CASCADE;
+DROP TABLE IF EXISTS dim_circuit          CASCADE;
+DROP TABLE IF EXISTS dim_date             CASCADE;
+ 
 
 -- dimension tables
 
@@ -62,7 +81,7 @@ CREATE TABLE fact_race_result(
     fastest_lap_time INTERVAL,
     result_id INT PRIMARY KEY,
     is_dnf BOOLEAN NOT NULL,
-    UNIQUE (race_id, driver_id)
+    UNIQUE (race_id, driver_id),
     FOREIGN KEY (race_id) REFERENCES dim_race(race_id),
     FOREIGN KEY (driver_id) REFERENCES dim_driver(driver_id),
     FOREIGN KEY (team_id) REFERENCES dim_team(team_id)

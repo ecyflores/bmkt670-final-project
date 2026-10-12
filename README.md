@@ -21,11 +21,10 @@ One row in my ML feature table = one race or lap
 
 ## How to Run
 1. Create and activate a virtual environment
-2. Install packages: pip install -r requirements.txt
-3. Create a .env file with your API keys and DB_PASSWORD 
+2. Install the database-check dependencies: `pip install psycopg2-binary python-dotenv`
+3. Create a .env file with your API keys and `DB_NAME`, `DB_USER`, and `DB_PASSWORD` (optionally `DB_HOST` and `DB_PORT`).
 4. Pull the data: run each script in etl/ (e.g., python etl/extract_games.py)  
-5. Build the database: run sql/schema.sql in pgAdmin or psql
-6. Confirm it worked: python db_check.py (should print all table names)
+5. Build and check the database: run `python db_check.py` (executes `schema.sql` from the project root and prints the table names; run it against an empty database).
 
 
 ## AI Usage
