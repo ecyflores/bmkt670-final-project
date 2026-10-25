@@ -17,7 +17,6 @@ One row in my ML feature table = one race or lap
 |Open-Metro Weather API|Hourly weather at circuits on race weekend – temp, precipitation, wind|Free API|  
 |FastF1 Python|Tire data, pit stop counts w/duration, car performance metric|Python Package|  
 
-[For hand-downloaded files, list the URL, date downloaded, and the clicks or filters you used.]
 
 ## How to Run
 1. Create and activate a virtual environment
@@ -32,3 +31,5 @@ Claude
     for picking and choosing which fields to pull from APIs
     data flow png
     honing in on error from schema
+Copilot in Visual Studio
+    for editing the extract files to pull data from seasons 2021-2025

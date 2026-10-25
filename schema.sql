@@ -4,29 +4,22 @@
 -- =====================================================================
  
 DROP VIEW  IF EXISTS ml_features_race_outcome CASCADE;
-DROP TABLE IF EXISTS fact_race_control    CASCADE;
-DROP TABLE IF EXISTS fact_stint           CASCADE;
-DROP TABLE IF EXISTS fact_pit_stop        CASCADE;
 DROP TABLE IF EXISTS fact_weather         CASCADE;
 DROP TABLE IF EXISTS fact_driver_standing CASCADE;
-DROP TABLE IF EXISTS fact_qualifying      CASCADE;
 DROP TABLE IF EXISTS fact_race_result     CASCADE;
 DROP TABLE IF EXISTS dim_race             CASCADE;
-DROP TABLE IF EXISTS dim_team             CASCADE;
 DROP TABLE IF EXISTS dim_driver           CASCADE;
 DROP TABLE IF EXISTS dim_circuit          CASCADE;
-DROP TABLE IF EXISTS dim_date             CASCADE;
- 
+-- DROP TABLE IF EXISTS dim_team             CASCADE;
+-- DROP TABLE IF EXISTS dim_date             CASCADE;
+-- DROP TABLE IF EXISTS fact_qualifying      CASCADE;
+-- DROP TABLE IF EXISTS fact_race_control    CASCADE;
+-- DROP TABLE IF EXISTS fact_stint           CASCADE;
+-- DROP TABLE IF EXISTS fact_pit_stop        CASCADE;
+
 
 -- dimension tables
 
-CREATE TABLE dim_date(
-    date_key DATE PRIMARY KEY,
-    season_year INT NOT NULL,
-    month INT NOT NULL,
-    day_of_week TEXT NOT NULL,
-    is_weekend BOOLEAN NOT NULL
-);
 
 CREATE TABLE dim_circuit(
     circuit_id INT PRIMARY KEY,
@@ -35,8 +28,7 @@ CREATE TABLE dim_circuit(
     locality TEXT,
     country TEXT NOT NULL,
     latitude NUMERIC(9,6) NOT NULL,
-    longitude NUMERIC(9,6) NOT NULL,
-    circuit_type TEXT NOT NULL
+    longitude NUMERIC(9,6) NOT NULL
 );
 
 CREATE TABLE dim_driver(
@@ -48,15 +40,6 @@ CREATE TABLE dim_driver(
     nationality TEXT NOT NULL
 );
 
-CREATE TABLE dim_team(
-    team_id INT PRIMARY KEY,
-    team_ref TEXT UNIQUE NOT NULL,
-    team_name TEXT NOT NULL,
-    season_year INT NOT NULL,
-    engine_supplier TEXT NOT NULL,
-    UNIQUE (team_ref, season_year)
-);
-
 CREATE TABLE dim_race(
     race_id INT PRIMARY KEY,
     season_year INT NOT NULL,
@@ -64,7 +47,6 @@ CREATE TABLE dim_race(
     circuit_id INT NOT NULL,
     race_name TEXT NOT NULL,
     race_date DATE NOT NULL,
-    race_start_time TIMESTAMP,
     FOREIGN KEY (circuit_id) REFERENCES dim_circuit(circuit_id)
 );
 
@@ -81,24 +63,6 @@ CREATE TABLE fact_race_result(
     fastest_lap_time INTERVAL,
     result_id INT PRIMARY KEY,
     is_dnf BOOLEAN NOT NULL,
-    UNIQUE (race_id, driver_id),
-    FOREIGN KEY (race_id) REFERENCES dim_race(race_id),
-    FOREIGN KEY (driver_id) REFERENCES dim_driver(driver_id),
-    FOREIGN KEY (team_id) REFERENCES dim_team(team_id)
-);
-
-CREATE TABLE fact_qualifying(
-    race_id INT NOT NULL,
-    driver_id INT NOT NULL,
-    team_id INT NOT NULL,
-    qualifying_position INT NOT NULL,
-    qualifying_time INTERVAL,
-    q1_time NUMERIC(7,3),
-    q2_time NUMERIC(7,3),
-    q3_time NUMERIC(7,3),
-    best_time NUMERIC(7,3),
-    gap_to_pole NUMERIC(6,3),
-    result_id INT PRIMARY KEY,
     UNIQUE (race_id, driver_id),
     FOREIGN KEY (race_id) REFERENCES dim_race(race_id),
     FOREIGN KEY (driver_id) REFERENCES dim_driver(driver_id),
@@ -131,7 +95,48 @@ CREATE TABLE fact_weather(
     FOREIGN KEY (race_id) REFERENCES dim_race(race_id)
 );
 
-CREATE TABLE fact_race_control(
+-- I have decided to not use the date table for the prediction model, but I will keep it here for future reference.
+/* CREATE TABLE dim_date(
+    date_key DATE PRIMARY KEY,
+    season_year INT NOT NULL,
+    month INT NOT NULL,
+    day_of_week TEXT NOT NULL,
+    is_weekend BOOLEAN NOT NULL
+); */ 
+
+-- I have decided not to use the team table for the prediction model, but I will keep it here for future reference.
+/* CREATE TABLE dim_team(
+    team_id INT PRIMARY KEY,
+    team_ref TEXT UNIQUE NOT NULL,
+    team_name TEXT NOT NULL,
+    season_year INT NOT NULL,
+    engine_supplier TEXT NOT NULL,
+    UNIQUE (team_ref, season_year)
+); */ 
+
+
+-- After evalutaing the qualifying 
+/* CREATE TABLE fact_qualifying(
+    race_id INT NOT NULL,
+    driver_id INT NOT NULL,
+    team_id INT NOT NULL,
+    qualifying_position INT NOT NULL,
+    qualifying_time INTERVAL,
+    q1_time NUMERIC(7,3),
+    q2_time NUMERIC(7,3),
+    q3_time NUMERIC(7,3),
+    best_time NUMERIC(7,3),
+    gap_to_pole NUMERIC(6,3),
+    result_id INT PRIMARY KEY,
+    UNIQUE (race_id, driver_id),
+    FOREIGN KEY (race_id) REFERENCES dim_race(race_id),
+    FOREIGN KEY (driver_id) REFERENCES dim_driver(driver_id),
+    FOREIGN KEY (team_id) REFERENCES dim_team(team_id)
+); */
+
+
+-- After evaluating the race control table I have decided not to use it for the prediction model, but I will keep it here for future reference.
+/* CREATE TABLE fact_race_control(
     pit_stop_id INT PRIMARY KEY,
     race_id INT NOT NULL,
     team_id INT NOT NULL,
@@ -141,4 +146,5 @@ CREATE TABLE fact_race_control(
     FOREIGN KEY (race_id) REFERENCES dim_race(race_id),
     FOREIGN KEY (team_id) REFERENCES dim_team(team_id),
     FOREIGN KEY (driver_id) REFERENCES dim_driver(driver_id)
-);
+); */ 
+

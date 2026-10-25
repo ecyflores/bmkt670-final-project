@@ -189,41 +189,37 @@ def write_results_to_csv02(all_races_and_sprints: list, filename: str):
 
 
 if __name__ == "__main__":
-    SEASON_YEAR = 2025
-    OUTPUT_FILE = f"f1_{SEASON_YEAR}_all_race_sprint_results.csv"
+    START_SEASON = 2021
+    END_SEASON = 2025
+    OUTPUT_FILE = f"f1_{START_SEASON}_{END_SEASON}_all_race_sprint_results.csv"
+    all_results_data = []
 
-    print(f"<<<Season Year: {SEASON_YEAR}")
+    for season_year in range(START_SEASON, END_SEASON + 1):
+        print(f"<<<Season Year: {season_year}")
 
-    # 1. Get the calendar for the season
-    season_calendar = get_season_calendar(SEASON_YEAR)
-    print("<<<Get the calendar for the season: {SEASON_YEAR}")
+        # Get the calendar and results for each race in this season.
+        season_calendar = get_season_calendar(season_year)
+        if season_calendar is None:
+            sys.exit(1)
 
-    if season_calendar:
-        all_results_data = []
-
-        # 2. Iterate through each race in the calendar
         for race_event in season_calendar:
             race_round = int(race_event['round'])
+            race_and_sprint_results = get_race_results(season_year, race_round)
 
-            # 3. Fetch the results for that specific round (includes main and sprint if available)
-            race_and_sprint_results = get_race_results(SEASON_YEAR, race_round)
+            print(
+                f"Returned results for {season_year} round "
+                f"{race_round}: {race_and_sprint_results}"
+            )
 
-            # Add diagnostic print here
-            print(f"Returned results for round {race_round}: {race_and_sprint_results}")
-
-
-            # 4. If results were successfully returned (either main or sprint or both), add them to our list
             if race_and_sprint_results:
                 all_results_data.extend(race_and_sprint_results)
 
-            # Be a good API citizen by waiting a moment between requests
+            # Be a good API citizen by waiting a moment between requests.
             time.sleep(0.5)
 
-        # 5. Write all the collected results to a single CSV file
-        write_results_to_csv(all_results_data, OUTPUT_FILE) #Race Results
-        write_results_to_csv02(all_results_data, OUTPUT_FILE) #Adding Sprint Results
-    else:
-        sys.exit(1)
+    # Write all seasons to one CSV file.
+    write_results_to_csv(all_results_data, OUTPUT_FILE)
+    write_results_to_csv02(all_results_data, OUTPUT_FILE)
 
 
 
