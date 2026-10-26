@@ -53,12 +53,33 @@
 | `fact_weather` | `wind_speed` | Open-Meteo Historical Weather API | Retrieved for the circuit coordinates and race time; summarized for the race. | Weather predictor for race-points analysis. |
 | `fact_weather` | `precipitation` | Open-Meteo Historical Weather API; FastF1 | Open-Meteo precipitation is matched to the race time; FastF1 rainfall/track observations can provide a cross-check. | Wet-weather predictor for race-points analysis. |
 | `fact_weather` | `weather_condition` | Open-Meteo Historical Weather API | Retrieved or categorized from the weather condition at the circuit around race time. | Describing and grouping race weather conditions. |
+| `ml_features_race_outcome` | `feature_id` | Calculated in Python | Sequential identifier assigned to each driver-race feature row. | Primary key for the model row. |
+| `ml_features_race_outcome` | `race_id` | Joined | Joined from `dim_race` using season and round. | Identifies the race for this prediction row. |
+| `ml_features_race_outcome` | `driver_id` | Joined | Joined from `dim_driver` using the normalized driver reference. | Identifies the driver whose points are predicted. |
+| `ml_features_race_outcome` | `season_year` | Joined | Taken from the scheduled race in `dim_race`. | Provides the known season and assigns the chronological data split. |
+| `ml_features_race_outcome` | `round` | Joined | Taken from the scheduled race in `dim_race`. | Indicates the race's scheduled order in its season. |
+| `ml_features_race_outcome` | `target_points` | Joined | Taken from `fact_race_result.points` for the same driver and race; this is the main-race outcome, not a predictor. | Target the model is trained to predict. |
+| `ml_features_race_outcome` | `grid_position` | Joined | Taken from `fact_race_result.grid_position`, which records the starting grid known before race start. | Pre-race predictor for starting position. |
+| `ml_features_race_outcome` | `driver_points_before_race` | Calculated in Python | Sum of this driver's main-race points from earlier races in the available 2021–2025 extract; current-race points are excluded. | Captures cumulative prior performance in the available data window. |
+| `ml_features_race_outcome` | `driver_avg_points_last_3_before_race` | Calculated in Python | Mean points from the driver's up to three previous main-race starts in the available extract, shifted so the current race is excluded; set to 0 when no earlier extracted start exists. | Captures recent form without target leakage. |
+| `ml_features_race_outcome` | `driver_starts_before_race` | Calculated in Python | Count of the driver's earlier main-race starts in the available extract. | Distinguishes drivers with no prior extracted history from those with several prior starts. |
+| `ml_features_race_outcome` | `sprint_weekend` | Calculated in Python | Boolean set from whether the same season and round has a scheduled sprint result entry; sprint scheduling is known before the main race. | Encoded indicator for sprint-weekend format. |
+| `ml_features_race_outcome` | `race_month_01` | Calculated in Python | True when the scheduled race date is in January; otherwise false. | First Boolean one-hot month indicator. |
+| `ml_features_race_outcome` | `race_month_02` | Calculated in Python | True when the scheduled race date is in February; otherwise false. | Second Boolean one-hot month indicator. |
+| `ml_features_race_outcome` | `race_month_03` | Calculated in Python | True when the scheduled race date is in March; otherwise false. | Third Boolean one-hot month indicator. |
+| `ml_features_race_outcome` | `race_month_04` | Calculated in Python | True when the scheduled race date is in April; otherwise false. | Fourth Boolean one-hot month indicator. |
+| `ml_features_race_outcome` | `race_month_05` | Calculated in Python | True when the scheduled race date is in May; otherwise false. | Fifth Boolean one-hot month indicator. |
+| `ml_features_race_outcome` | `race_month_06` | Calculated in Python | True when the scheduled race date is in June; otherwise false. | Sixth Boolean one-hot month indicator. |
+| `ml_features_race_outcome` | `race_month_07` | Calculated in Python | True when the scheduled race date is in July; otherwise false. | Seventh Boolean one-hot month indicator. |
+| `ml_features_race_outcome` | `race_month_08` | Calculated in Python | True when the scheduled race date is in August; otherwise false. | Eighth Boolean one-hot month indicator. |
+| `ml_features_race_outcome` | `race_month_09` | Calculated in Python | True when the scheduled race date is in September; otherwise false. | Ninth Boolean one-hot month indicator. |
+| `ml_features_race_outcome` | `race_month_10` | Calculated in Python | True when the scheduled race date is in October; otherwise false. | Tenth Boolean one-hot month indicator. |
+| `ml_features_race_outcome` | `race_month_11` | Calculated in Python | True when the scheduled race date is in November; otherwise false. | Eleventh Boolean one-hot month indicator. |
+| `ml_features_race_outcome` | `race_month_12` | Calculated in Python | True when the scheduled race date is in December; otherwise false. | Twelfth Boolean one-hot month indicator. |
+| `ml_features_race_outcome` | `split` | Calculated in Python | Set from season: 2021–2023 `train`, 2024 `validate`, and 2025 `test`. | Keeps evaluation chronological and prevents random mixing of future seasons into training. |
 
-The `etl/extract_weather_api.py` extractor saves hourly observations for each race
-weekend in `f1_weather_2021_2025.csv`. The CSV includes season, round, race and
-circuit identifiers, UTC timestamps, coordinates, temperature, relative humidity,
-precipitation, wind speed, and weather code. These hourly observations are raw
-source data; they are not automatically aggregated into `fact_weather`.
+
+
 <!-- | `dim_date` | `date_key` | Jolpica F1 API | Taken from the race date and stored as the calendar date key. | Date dimension key for joining races to calendar attributes. |
 | `dim_date` | `season_year` | Jolpica F1 API | Extracted from the race season. | Filtering and grouping races by season. |
 | `dim_date` | `month` | Derived from race date | Extracted as the calendar month from `date_key`. | Seasonal and month-based analysis. |

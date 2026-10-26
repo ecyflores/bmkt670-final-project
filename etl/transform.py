@@ -69,6 +69,21 @@ TABLE_COLUMNS = {
         "precipitation",
         "weather_condition",
     ],
+    "ml_features_race_outcome": [
+        "feature_id",
+        "race_id",
+        "driver_id",
+        "season_year",
+        "round",
+        "target_points",
+        "grid_position",
+        "driver_points_before_race",
+        "driver_avg_points_last_3_before_race",
+        "driver_starts_before_race",
+        "sprint_weekend",
+        *[f"race_month_{month:02d}" for month in range(1, 13)],
+        "split",
+    ],
 }
 
 RAW_RACE_PATTERN = "f1_*all_race_sprint_results.csv"
@@ -437,6 +452,78 @@ def _build_tables(raw_results: pd.DataFrame, raw_weather: pd.DataFrame) -> dict[
         columns=TABLE_COLUMNS["fact_weather"],
     )
 
+    race_results = race_results.sort_values(["season", "round", "driver_id"]).copy()
+    points_by_driver = race_results.groupby("driver_id", sort=False)["points"]
+    race_results["driver_points_before_race"] = points_by_driver.transform(
+        lambda points: points.cumsum().shift(1).fillna(0)
+    )
+    race_results["driver_avg_points_last_3_before_race"] = points_by_driver.transform(
+        lambda points: points.shift(1).rolling(window=3, min_periods=1).mean().fillna(0)
+    )
+    race_results["driver_starts_before_race"] = race_results.groupby(
+        "driver_id", sort=False
+    ).cumcount()
+
+    sprint_races = {
+        (int(season), int(round_number))
+        for season, round_number in results.loc[
+            results["race_type"].eq("sprint"), ["season", "round"]
+        ].drop_duplicates().itertuples(index=False, name=None)
+    }
+    race_results["sprint_weekend"] = [
+        (int(season), int(round_number)) in sprint_races
+        for season, round_number in zip(race_results["season"], race_results["round"])
+    ]
+    race_results["season_year"] = race_results["season"].astype(int)
+    race_results["round"] = race_results["round"].astype(int)
+    race_results["split"] = race_results["season_year"].map(
+        {
+            2021: "train",
+            2022: "train",
+            2023: "train",
+            2024: "validate",
+            2025: "test",
+        }
+    )
+    race_month = pd.to_datetime(race_results["date"]).dt.month
+    for month in range(1, 13):
+        race_results[f"race_month_{month:02d}"] = race_month.eq(month)
+
+    feature_data = {
+        "feature_id": range(1, len(race_results) + 1),
+        "race_id": race_results["race_id"],
+        "driver_id": race_results["driver_id"],
+        "season_year": race_results["season_year"],
+        "round": race_results["round"],
+        "target_points": race_results["points"],
+        "grid_position": race_results["grid_position"],
+        "driver_points_before_race": race_results["driver_points_before_race"],
+        "driver_avg_points_last_3_before_race": race_results[
+            "driver_avg_points_last_3_before_race"
+        ],
+        "driver_starts_before_race": race_results["driver_starts_before_race"],
+        "sprint_weekend": race_results["sprint_weekend"],
+        "split": race_results["split"],
+    }
+    feature_data.update(
+        {
+            f"race_month_{month:02d}": race_results[f"race_month_{month:02d}"]
+            for month in range(1, 13)
+        }
+    )
+    ml_features = pd.DataFrame(
+        feature_data,
+        columns=TABLE_COLUMNS["ml_features_race_outcome"],
+    )
+    if ml_features["split"].isna().any():
+        unknown_seasons = sorted(
+            race_results.loc[race_results["split"].isna(), "season_year"].unique()
+        )
+        raise ValueError(
+            "ML feature split is undefined for seasons: "
+            f"{unknown_seasons}. Expected seasons 2021 through 2025."
+        )
+
     tables = {
         "dim_circuit": dim_circuit,
         "dim_driver": dim_driver,
@@ -444,6 +531,7 @@ def _build_tables(raw_results: pd.DataFrame, raw_weather: pd.DataFrame) -> dict[
         "fact_race_result": fact_race_result,
         "fact_driver_standing": fact_driver_standing,
         "fact_weather": fact_weather,
+        "ml_features_race_outcome": ml_features,
     }
     for name, dataframe in tables.items():
         tables[name] = dataframe.reindex(columns=TABLE_COLUMNS[name])
