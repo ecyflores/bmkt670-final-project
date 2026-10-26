@@ -3,11 +3,49 @@ from fastf1 import plotting
 import pandas as pd
 
 import requests
+import requests_cache
 import csv
 import sys
 import time
+from pathlib import Path
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 API_BASE_URL = "https://api.jolpi.ca/ergast/f1"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+RAW_DIR = PROJECT_ROOT / "data" / "raw"
+REQUEST_DELAY_SECONDS = 1.0
+RAW_DIR.mkdir(parents=True, exist_ok=True)
+
+retry_policy = Retry(
+    total=6,
+    connect=6,
+    read=6,
+    status=6,
+    backoff_factor=2,
+    backoff_max=120,
+    status_forcelist=(429, 500, 502, 503, 504),
+    allowed_methods=frozenset({"GET"}),
+    respect_retry_after_header=True,
+)
+api_session = requests_cache.CachedSession(
+    str(RAW_DIR / ".jolpica_cache"),
+    expire_after=30 * 24 * 60 * 60,
+)
+api_session.mount("https://", HTTPAdapter(max_retries=retry_policy))
+api_session.headers.update({"User-Agent": "bmkt670-f1-data-project/1.0"})
+
+
+def get_api_json(url: str):
+    """Get cached API JSON and retry temporary rate-limit/server errors."""
+    try:
+        response = api_session.get(url, timeout=30)
+        response.raise_for_status()
+        if not getattr(response, "from_cache", False):
+            time.sleep(REQUEST_DELAY_SECONDS)
+        return response.json()
+    except requests.exceptions.RequestException as error:
+        raise RuntimeError(f"Jolpica request failed for {url}: {error}") from error
 
 def get_season_calendar(season: int):
     """Fetches the race calendar for a given F1 season."""
@@ -15,16 +53,12 @@ def get_season_calendar(season: int):
     print(f"Fetching season calendar from: {url}")
 
     try:
-        response = requests.get(url, timeout=30)
-        response.raise_for_status()
-        data = response.json()
+        data = get_api_json(url)
         return data['MRData']['RaceTable']['Races']
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching calendar: {e}")
-        return None
     except KeyError:
-        print("Error: Could not find 'Races' data in calendar response.")
-        return None
+        raise RuntimeError(
+            f"Could not find race calendar data in Jolpica response for {season}."
+        ) from None
 
 def get_race_results(season: int, race_round: int):
     """Fetches the results for a single race (including sprint if available) by its season and round number."""
@@ -34,9 +68,7 @@ def get_race_results(season: int, race_round: int):
     main_race_url = f"{API_BASE_URL}/{season}/{race_round}/results.json?limit=100"
     print(f"Fetching main race results for round {race_round}...{main_race_url}")
     try:
-        response = requests.get(main_race_url, timeout=30)
-        response.raise_for_status()
-        data = response.json()
+        data = get_api_json(main_race_url)
         if data['MRData']['RaceTable']['Races']:
             main_race_data = data['MRData']['RaceTable']['Races'][0]
             # Add a 'type' key to distinguish between main race and sprint
@@ -44,18 +76,16 @@ def get_race_results(season: int, race_round: int):
             all_results_for_round.append(main_race_data)
         else:
             print(f"  -> No main race results found for round {race_round} (likely not raced yet).")
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching main race results for round {race_round}: {e}")
     except KeyError:
-        print(f"Error: Could not parse main race results data for round {race_round}.")
+        raise RuntimeError(
+            f"Could not parse main race results for {season} round {race_round}."
+        ) from None
 
     # Fetch sprint race results (if available)
     sprint_url = f"{API_BASE_URL}/{season}/{race_round}/sprint.json?limit=100"
     print(f"Fetching sprint race results for round {race_round}...{sprint_url}")
     try:
-        response = requests.get(sprint_url, timeout=30)
-        response.raise_for_status()
-        data = response.json()
+        data = get_api_json(sprint_url)
         if data['MRData']['RaceTable']['Races']:
             sprint_data = data['MRData']['RaceTable']['Races'][0]
             # Add a 'type' key to distinguish between main race and sprint
@@ -63,10 +93,10 @@ def get_race_results(season: int, race_round: int):
             all_results_for_round.append(sprint_data)
         else:
              print(f"  -> No sprint race results found for round {race_round}.")
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching sprint race results for round {race_round}: {e}")
     except KeyError:
-        print(f"Error: Could not parse sprint race results data for round {race_round}.")
+        raise RuntimeError(
+            f"Could not parse sprint results for {season} round {race_round}."
+        ) from None
 
 
     return all_results_for_round if all_results_for_round else None
@@ -191,7 +221,8 @@ def write_results_to_csv02(all_races_and_sprints: list, filename: str):
 if __name__ == "__main__":
     START_SEASON = 2021
     END_SEASON = 2025
-    OUTPUT_FILE = f"f1_{START_SEASON}_{END_SEASON}_all_race_sprint_results.csv"
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
+    OUTPUT_FILE = RAW_DIR / f"f1_{START_SEASON}_{END_SEASON}_all_race_sprint_results.csv"
     all_results_data = []
 
     for season_year in range(START_SEASON, END_SEASON + 1):
@@ -214,12 +245,9 @@ if __name__ == "__main__":
             if race_and_sprint_results:
                 all_results_data.extend(race_and_sprint_results)
 
-            # Be a good API citizen by waiting a moment between requests.
-            time.sleep(1)
-
     # Write all seasons to one CSV file.
-    write_results_to_csv(all_results_data, OUTPUT_FILE)
-    write_results_to_csv02(all_results_data, OUTPUT_FILE)
+    write_results_to_csv(all_results_data, str(OUTPUT_FILE))
+    write_results_to_csv02(all_results_data, str(OUTPUT_FILE))
 
 
 

@@ -1,16 +1,23 @@
 from datetime import timedelta
 import time
+from pathlib import Path
+
 import openmeteo_requests
 import pandas as pd
 import requests
 import requests_cache
-from retry_requests import retry
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 JOLPICA_API_URL = "https://api.jolpi.ca/ergast/f1"
 OPEN_METEO_ARCHIVE_URL = "https://archive-api.open-meteo.com/v1/archive"
 START_SEASON = 2021
 END_SEASON = 2025
-OUTPUT_FILE = f"f1_weather_{START_SEASON}_{END_SEASON}.csv"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+RAW_DIR = PROJECT_ROOT / "data" / "raw"
+OUTPUT_FILE = RAW_DIR / f"f1_weather_{START_SEASON}_{END_SEASON}.csv"
+REQUEST_DELAY_SECONDS = 1.0
+RAW_DIR.mkdir(parents=True, exist_ok=True)
 HOURLY_VARIABLES = [
     "temperature_2m",
     "relative_humidity_2m",
@@ -19,15 +26,34 @@ HOURLY_VARIABLES = [
     "weather_code",
 ]
 
-cache_session = requests_cache.CachedSession(".cache", expire_after=3600)
-retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
-openmeteo = openmeteo_requests.Client(session=retry_session)
+retry_policy = Retry(
+    total=6,
+    connect=6,
+    read=6,
+    status=6,
+    backoff_factor=2,
+    backoff_max=120,
+    status_forcelist=(429, 500, 502, 503, 504),
+    allowed_methods=frozenset({"GET"}),
+    respect_retry_after_header=True,
+)
+cache_session = requests_cache.CachedSession(
+    str(RAW_DIR / ".openmeteo_cache"),
+    expire_after=30 * 24 * 60 * 60,
+)
+cache_session.mount("https://", HTTPAdapter(max_retries=retry_policy))
+cache_session.headers.update({"User-Agent": "bmkt670-f1-data-project/1.0"})
+openmeteo = openmeteo_requests.Client(session=cache_session)
 
 
 def get_season_calendar(season: int) -> list[dict]:
     """Fetch race dates and circuit coordinates for a season."""
-    response = requests.get(f"{JOLPICA_API_URL}/{season}.json", timeout=30)
-    response.raise_for_status()
+    url = f"{JOLPICA_API_URL}/{season}.json"
+    try:
+        response = cache_session.get(url, timeout=30)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as error:
+        raise RuntimeError(f"Jolpica calendar request failed for {url}: {error}") from error
     return response.json()["MRData"]["RaceTable"]["Races"]
 
 
@@ -45,7 +71,12 @@ def get_race_weekend_weather(season: int, race: dict) -> pd.DataFrame:
         "timezone": "auto",
     }
 
-    response = openmeteo.weather_api(OPEN_METEO_ARCHIVE_URL, params=params)[0]
+    try:
+        response = openmeteo.weather_api(OPEN_METEO_ARCHIVE_URL, params=params)[0]
+    except requests.exceptions.RequestException as error:
+        raise RuntimeError(
+            f"Open-Meteo request failed for {race['raceName']} ({season}): {error}"
+        ) from error
     hourly = response.Hourly()
     times = pd.date_range(
         start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
@@ -69,6 +100,7 @@ def get_race_weekend_weather(season: int, race: dict) -> pd.DataFrame:
 
 
 def main() -> None:
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
     weather_frames = []
 
     for season in range(START_SEASON, END_SEASON + 1):
@@ -76,7 +108,7 @@ def main() -> None:
         for race in get_season_calendar(season):
             print(f"  {race['raceName']} ({race['date']})")
             weather_frames.append(get_race_weekend_weather(season, race))
-            time.sleep(0.5)
+            time.sleep(REQUEST_DELAY_SECONDS)
 
     if not weather_frames:
         raise RuntimeError("No race weekend weather data was retrieved.")
