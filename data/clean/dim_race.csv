@@ -1,0 +1,86 @@
+race_id,season_year,round,circuit_id,race_name,race_date
+1,2021,1,7,Bahrain Grand Prix,2021-03-28
+2,2021,2,2,Emilia Romagna Grand Prix,2021-04-18
+3,2021,3,5,Portuguese Grand Prix,2021-05-02
+4,2021,4,12,Spanish Grand Prix,2021-05-09
+5,2021,5,13,Monaco Grand Prix,2021-05-23
+6,2021,6,8,Azerbaijan Grand Prix,2021-06-06
+7,2021,7,11,French Grand Prix,2021-06-20
+8,2021,8,23,Styrian Grand Prix,2021-06-27
+9,2021,9,23,Austrian Grand Prix,2021-07-04
+10,2021,10,25,British Grand Prix,2021-07-18
+11,2021,11,16,Hungarian Grand Prix,2021-08-01
+12,2021,12,14,Belgian Grand Prix,2021-08-29
+13,2021,13,10,Dutch Grand Prix,2021-09-05
+14,2021,14,3,Italian Grand Prix,2021-09-12
+15,2021,15,26,Russian Grand Prix,2021-09-26
+16,2021,16,17,Turkish Grand Prix,2021-10-10
+17,2021,17,15,United States Grand Prix,2021-10-24
+18,2021,18,4,Mexico City Grand Prix,2021-11-07
+19,2021,19,6,São Paulo Grand Prix,2021-11-14
+20,2021,20,20,Qatar Grand Prix,2021-11-21
+21,2021,21,18,Saudi Arabian Grand Prix,2021-12-05
+22,2021,22,28,Abu Dhabi Grand Prix,2021-12-12
+23,2022,1,7,Bahrain Grand Prix,2022-03-20
+24,2022,2,18,Saudi Arabian Grand Prix,2022-03-27
+25,2022,3,1,Australian Grand Prix,2022-04-10
+26,2022,4,2,Emilia Romagna Grand Prix,2022-04-24
+27,2022,5,22,Miami Grand Prix,2022-05-08
+28,2022,6,12,Spanish Grand Prix,2022-05-22
+29,2022,7,13,Monaco Grand Prix,2022-05-29
+30,2022,8,8,Azerbaijan Grand Prix,2022-06-12
+31,2022,9,9,Canadian Grand Prix,2022-06-19
+32,2022,10,25,British Grand Prix,2022-07-03
+33,2022,11,23,Austrian Grand Prix,2022-07-10
+34,2022,12,11,French Grand Prix,2022-07-24
+35,2022,13,16,Hungarian Grand Prix,2022-07-31
+36,2022,14,14,Belgian Grand Prix,2022-08-28
+37,2022,15,10,Dutch Grand Prix,2022-09-04
+38,2022,16,3,Italian Grand Prix,2022-09-11
+39,2022,17,21,Singapore Grand Prix,2022-10-02
+40,2022,18,27,Japanese Grand Prix,2022-10-09
+41,2022,19,15,United States Grand Prix,2022-10-23
+42,2022,20,4,Mexico City Grand Prix,2022-10-30
+43,2022,21,6,São Paulo Grand Prix,2022-11-13
+44,2022,22,28,Abu Dhabi Grand Prix,2022-11-20
+45,2023,1,7,Bahrain Grand Prix,2023-03-05
+46,2023,2,18,Saudi Arabian Grand Prix,2023-03-19
+47,2023,3,1,Australian Grand Prix,2023-04-02
+48,2023,4,8,Azerbaijan Grand Prix,2023-04-30
+49,2023,5,22,Miami Grand Prix,2023-05-07
+50,2023,6,13,Monaco Grand Prix,2023-05-28
+51,2023,7,12,Spanish Grand Prix,2023-06-04
+52,2023,10,25,British Grand Prix,2023-07-09
+53,2023,11,16,Hungarian Grand Prix,2023-07-23
+54,2023,14,3,Italian Grand Prix,2023-09-03
+55,2023,15,21,Singapore Grand Prix,2023-09-17
+56,2023,16,27,Japanese Grand Prix,2023-09-24
+57,2023,17,20,Qatar Grand Prix,2023-10-08
+58,2023,19,4,Mexico City Grand Prix,2023-10-29
+59,2023,20,6,São Paulo Grand Prix,2023-11-05
+60,2023,21,19,Las Vegas Grand Prix,2023-11-19
+61,2024,2,18,Saudi Arabian Grand Prix,2024-03-09
+62,2024,3,1,Australian Grand Prix,2024-03-24
+63,2024,5,24,Chinese Grand Prix,2024-04-21
+64,2024,6,22,Miami Grand Prix,2024-05-05
+65,2024,7,2,Emilia Romagna Grand Prix,2024-05-19
+66,2024,10,12,Spanish Grand Prix,2024-06-23
+67,2024,13,16,Hungarian Grand Prix,2024-07-21
+68,2024,14,14,Belgian Grand Prix,2024-07-28
+69,2024,17,8,Azerbaijan Grand Prix,2024-09-15
+70,2024,20,4,Mexico City Grand Prix,2024-10-27
+71,2024,22,19,Las Vegas Grand Prix,2024-11-23
+72,2024,23,20,Qatar Grand Prix,2024-12-01
+73,2024,24,28,Abu Dhabi Grand Prix,2024-12-08
+74,2025,3,27,Japanese Grand Prix,2025-04-06
+75,2025,4,7,Bahrain Grand Prix,2025-04-13
+76,2025,7,2,Emilia Romagna Grand Prix,2025-05-18
+77,2025,8,13,Monaco Grand Prix,2025-05-25
+78,2025,11,23,Austrian Grand Prix,2025-06-29
+79,2025,14,16,Hungarian Grand Prix,2025-08-03
+80,2025,15,10,Dutch Grand Prix,2025-08-31
+81,2025,16,3,Italian Grand Prix,2025-09-07
+82,2025,19,15,United States Grand Prix,2025-10-19
+83,2025,20,4,Mexico City Grand Prix,2025-10-26
+84,2025,22,19,Las Vegas Grand Prix,2025-11-23
+85,2025,23,20,Qatar Grand Prix,2025-11-30

@@ -1,0 +1,29 @@
+circuit_id,circuit_ref,circuit_name,locality,country,latitude,longitude
+1,albert_park_grand_prix_circuit,Albert Park Grand Prix Circuit,,,-37.8497,144.968
+2,autodromo_enzo_e_dino_ferrari,Autodromo Enzo e Dino Ferrari,,,44.3439,11.7167
+3,autodromo_nazionale_di_monza,Autodromo Nazionale di Monza,,,45.6156,9.28111
+4,aut_dromo_hermanos_rodr_guez,Autódromo Hermanos Rodríguez,,,19.4042,-99.0907
+5,aut_dromo_internacional_do_algarve,Autódromo Internacional do Algarve,,,37.227,-8.6267
+6,aut_dromo_jos_carlos_pace,Autódromo José Carlos Pace,,,-23.7036,-46.6997
+7,bahrain_international_circuit,Bahrain International Circuit,,,26.0325,50.5106
+8,baku_city_circuit,Baku City Circuit,,,40.3725,49.8533
+9,circuit_gilles_villeneuve,Circuit Gilles Villeneuve,,,45.5,-73.5228
+10,circuit_park_zandvoort,Circuit Park Zandvoort,,,52.3888,4.54092
+11,circuit_paul_ricard,Circuit Paul Ricard,,,43.2506,5.79167
+12,circuit_de_barcelona_catalunya,Circuit de Barcelona-Catalunya,,,41.57,2.26111
+13,circuit_de_monaco,Circuit de Monaco,,,43.7347,7.42056
+14,circuit_de_spa_francorchamps,Circuit de Spa-Francorchamps,,,50.4372,5.97139
+15,circuit_of_the_americas,Circuit of the Americas,,,30.1328,-97.6411
+16,hungaroring,Hungaroring,,,47.5789,19.2486
+17,istanbul_park,Istanbul Park,,,40.9517,29.405
+18,jeddah_corniche_circuit,Jeddah Corniche Circuit,,,21.6319,39.1044
+19,las_vegas_strip_street_circuit,Las Vegas Strip Street Circuit,,,36.1147,-115.173
+20,lusail_international_circuit,Lusail International Circuit,,,25.49,51.4542
+21,marina_bay_street_circuit,Marina Bay Street Circuit,,,1.2914,103.864
+22,miami_international_autodrome,Miami International Autodrome,,,25.9581,-80.2389
+23,red_bull_ring,Red Bull Ring,,,47.2197,14.7647
+24,shanghai_international_circuit,Shanghai International Circuit,,,31.3389,121.22
+25,silverstone_circuit,Silverstone Circuit,,,52.0786,-1.01694
+26,sochi_autodrom,Sochi Autodrom,,,43.4057,39.9578
+27,suzuka_circuit,Suzuka Circuit,,,34.8431,136.541
+28,yas_marina_circuit,Yas Marina Circuit,,,24.4672,54.6031

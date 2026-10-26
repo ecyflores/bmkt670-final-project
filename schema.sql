@@ -56,7 +56,6 @@ CREATE TABLE dim_race(
 CREATE TABLE fact_race_result(
     race_id INT NOT NULL,
     driver_id INT NOT NULL,
-    team_id INT NOT NULL,
     grid_position INT NOT NULL,
     finishing_position INT NOT NULL,
     points NUMERIC(5,2) NOT NULL,
@@ -65,22 +64,19 @@ CREATE TABLE fact_race_result(
     is_dnf BOOLEAN NOT NULL,
     UNIQUE (race_id, driver_id),
     FOREIGN KEY (race_id) REFERENCES dim_race(race_id),
-    FOREIGN KEY (driver_id) REFERENCES dim_driver(driver_id),
-    FOREIGN KEY (team_id) REFERENCES dim_team(team_id)
+    FOREIGN KEY (driver_id) REFERENCES dim_driver(driver_id)
 );
 
 CREATE TABLE fact_driver_standing(
     standing_id INT PRIMARY KEY,
     race_id INT NOT NULL,
     driver_id INT NOT NULL,
-    team_id INT NOT NULL,
     position_after INT NOT NULL,
     points_after NUMERIC(5,2) NOT NULL,
     wins_after INT NOT NULL,
     UNIQUE (race_id, driver_id),
     FOREIGN KEY (race_id) REFERENCES dim_race(race_id),
-    FOREIGN KEY (driver_id) REFERENCES dim_driver(driver_id),
-    FOREIGN KEY (team_id) REFERENCES dim_team(team_id)
+    FOREIGN KEY (driver_id) REFERENCES dim_driver(driver_id)
 );
 
 CREATE TABLE fact_weather(

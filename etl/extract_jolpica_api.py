@@ -215,7 +215,7 @@ if __name__ == "__main__":
                 all_results_data.extend(race_and_sprint_results)
 
             # Be a good API citizen by waiting a moment between requests.
-            time.sleep(0.5)
+            time.sleep(1)
 
     # Write all seasons to one CSV file.
     write_results_to_csv(all_results_data, OUTPUT_FILE)

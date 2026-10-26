@@ -9,7 +9,7 @@ How many points will top 5 championship contenders score in the upcoming race?
 Points scored or classification style (podium, points, no points)
 
 ## Prediction Unit
-One row in my ML feature table = one race or lap
+One row in my ML feature table = one race
 
 ## Data Sources
 | Source | What it provides | Access |
@@ -22,8 +22,10 @@ One row in my ML feature table = one race or lap
 1. Create and activate a virtual environment
 2. Install the database-check dependencies: `pip install psycopg2-binary python-dotenv`
 3. Create a .env file with your API keys and `DB_NAME`, `DB_USER`, and `DB_PASSWORD` (optionally `DB_HOST` and `DB_PORT`).
-4. Pull the data: run each script in etl/ (e.g., python etl/extract_games.py)  
-5. Build and check the database: run `python db_check.py` (executes `schema.sql` from the project root and prints the table names; run it against an empty database).
+4. Pull the raw data by running the extractors in `etl/`.
+5. Transform the raw CSVs into schema-shaped tables: `python etl/transform.py`. This writes `data/clean/<table_name>.csv` and leaves `data/raw/` unchanged. Race results are one row per driver per main race; sprint result rows are excluded from that prediction table. Driver standings are calculated from all race and sprint points before filtering to main-race results. Weather is summarized per race by averaging temperature, humidity, and wind speed, summing precipitation, and using the most frequent weather code across the available weekend hours. Weather timestamps are parsed as UTC and races/weather are joined using season and round. The script reports any raw weather rows that do not have a matching race key and excludes them from `fact_weather`.
+6. Review the clean CSVs, then build and check the database with `python db_check.py` (executes `schema.sql` from the project root; run it against an empty database).
+
 
 
 ## AI Usage
