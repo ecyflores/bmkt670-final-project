@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 def main():
     load_dotenv()
 
-    required = ("PGDATABASE", "PGUSER", "PGPASSWORD", "PGHOST", "PGPORT")
+    required = ("PGDATABASE", "PGUSER", "PGPASSWORD")
     missing = [name for name in required if not os.getenv(name)]
     if missing:
         raise SystemExit(
